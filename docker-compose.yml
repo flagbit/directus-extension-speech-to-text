@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  directus:
+    image: directus/directus:latest
+    ports:
+      - "8057:8055"
+    volumes:
+      - directus_uploads:/directus/uploads
+      - directus_database:/directus/database
+      - ./package.json:/directus/extensions/directus-extension-speech-to-text/package.json:ro
+      - ./index.js:/directus/extensions/directus-extension-speech-to-text/index.js:ro
+    environment:
+      KEY: '255d861b-5ea1-5996-9aa3-922530ec40b1'
+      SECRET: '6116487b-cda1-52c2-b5b5-c8022c45e263'
+      DB_CLIENT: 'sqlite3'
+      DB_FILENAME: '/directus/database/data.db'
+      ADMIN_EMAIL: 'admin@example.com'
+      ADMIN_PASSWORD: 'directus123'
+      PUBLIC_URL: 'http://localhost:8057'
+      WEBSOCKETS_ENABLED: true
+      EXTENSIONS_PATH: '/directus/extensions'
+
+volumes:
+  directus_uploads:
+  directus_database:

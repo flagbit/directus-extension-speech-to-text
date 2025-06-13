@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech-to-Text Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .demo-container { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        .input-group { margin: 20px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        textarea { min-height: 100px; resize: vertical; }
+        .mic-button { 
+            background: #007bff; color: white; border: none; padding: 10px 20px; 
+            border-radius: 4px; cursor: pointer; margin-left: 10px; 
+        }
+        .mic-button:hover { background: #0056b3; }
+        .mic-button.recording { background: #dc3545; }
+        .mic-button:disabled { background: #6c757d; cursor: not-allowed; }
+        .status { margin: 10px 0; font-style: italic; color: #666; }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+        .api-key-group { background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🎤 Speech-to-Text Demo</h1>
+    <p>Dies ist eine Demonstration des Speech-to-Text Interface, das für Directus entwickelt wurde.</p>
+    
+    <div class="demo-container">
+        <div class="api-key-group">
+            <label for="apiKey">OpenAI API Key:</label>
+            <input type="password" id="apiKey" placeholder="Ihren OpenAI API Key hier eingeben">
+            <small>Benötigt für die Spracherkennung via OpenAI Whisper API</small>
+        </div>
+
+        <div class="input-group">
+            <label for="textInput">Text Eingabe:</label>
+            <input type="text" id="textInput" placeholder="Text eingeben oder Mikrofon verwenden...">
+            <button id="micButton" class="mic-button" disabled>🎤 Aufnehmen</button>
+        </div>
+
+        <div class="input-group">
+            <label for="textArea">Längerer Text:</label>
+            <textarea id="textArea" placeholder="Längeren Text eingeben oder per Sprache diktieren..."></textarea>
+            <button id="micButton2" class="mic-button" disabled>🎤 Aufnehmen</button>
+        </div>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <h2>Verwendung</h2>
+    <ol>
+        <li>Geben Sie Ihren OpenAI API Key ein</li>
+        <li>Klicken Sie auf einen der "🎤 Aufnehmen" Buttons</li>
+        <li>Sprechen Sie Ihren Text</li>
+        <li>Klicken Sie erneut um die Aufnahme zu stoppen</li>
+        <li>Der erkannte Text wird automatisch eingefügt</li>
+    </ol>
+
+    <h2>Für Directus Integration</h2>
+    <p>Dieses Interface kann als Directus Extension verwendet werden für:</p>
+    <ul>
+        <li>String-Felder (kurze Texte)</li>
+        <li>Text-Felder (längere Inhalte)</li>
+        <li>Mehrsprachige Inhalte</li>
+        <li>Content-Management mit Spracheingabe</li>
+    </ul>
+
+    <script>
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+
+        const apiKeyInput = document.getElementById('apiKey');
+        const micButton = document.getElementById('micButton');
+        const micButton2 = document.getElementById('micButton2');
+        const textInput = document.getElementById('textInput');
+        const textArea = document.getElementById('textArea');
+        const status = document.getElementById('status');
+
+        // Enable mic buttons when API key is entered
+        apiKeyInput.addEventListener('input', function() {
+            const hasKey = this.value.trim().length > 0;
+            micButton.disabled = !hasKey;
+            micButton2.disabled = !hasKey;
+        });
+
+        function setupMicButton(button, targetInput) {
+            button.addEventListener('click', function() {
+                if (isRecording) {
+                    stopRecording();
+                } else {
+                    startRecording(targetInput);
+                }
+            });
+        }
+
+        setupMicButton(micButton, textInput);
+        setupMicButton(micButton2, textArea);
+
+        async function startRecording(targetInput) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        sampleRate: 16000,
+                        channelCount: 1,
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                    }
+                });
+                
+                audioChunks = [];
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = async () => {
+                    stream.getTracks().forEach(track => track.stop());
+                    await processAudio(targetInput);
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                updateUI();
+                status.textContent = '🎤 Aufnahme läuft... Klicken Sie erneut zum Stoppen.';
+                status.className = 'status success';
+            } catch (err) {
+                status.textContent = '❌ Mikrofonzugriff fehlgeschlagen. Bitte Berechtigung erteilen.';
+                status.className = 'status error';
+                console.error('Error accessing microphone:', err);
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                updateUI();
+                status.textContent = '⏳ Verarbeite Aufnahme...';
+                status.className = 'status';
+            }
+        }
+
+        function updateUI() {
+            const buttons = [micButton, micButton2];
+            buttons.forEach(button => {
+                if (isRecording) {
+                    button.textContent = '⏹️ Stoppen';
+                    button.classList.add('recording');
+                } else {
+                    button.textContent = '🎤 Aufnehmen';
+                    button.classList.remove('recording');
+                }
+            });
+        }
+
+        async function processAudio(targetInput) {
+            if (audioChunks.length === 0) return;
+            
+            try {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
+                
+                // Convert to WAV for better OpenAI compatibility
+                const arrayBuffer = await audioBlob.arrayBuffer();
+                const audioBuffer = await new AudioContext().decodeAudioData(arrayBuffer);
+                const wavBlob = audioBufferToWav(audioBuffer);
+                
+                const formData = new FormData();
+                formData.append('file', wavBlob, 'audio.wav');
+                formData.append('model', 'whisper-1');
+                formData.append('language', 'de'); // German
+                
+                const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKeyInput.value}`,
+                    },
+                    body: formData,
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`OpenAI API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.text) {
+                    const currentValue = targetInput.value || '';
+                    const newValue = currentValue ? `${currentValue} ${result.text}` : result.text;
+                    targetInput.value = newValue;
+                    status.textContent = `✅ Text erfolgreich erkannt: "${result.text}"`;
+                    status.className = 'status success';
+                } else {
+                    status.textContent = '⚠️ Kein Text erkannt. Versuchen Sie es erneut.';
+                    status.className = 'status error';
+                }
+            } catch (err) {
+                status.textContent = `❌ Fehler bei der Spracherkennung: ${err.message}`;
+                status.className = 'status error';
+                console.error('Speech recognition error:', err);
+            }
+        }
+
+        function audioBufferToWav(audioBuffer) {
+            const numberOfChannels = audioBuffer.numberOfChannels;
+            const sampleRate = audioBuffer.sampleRate;
+            const format = 1; // PCM
+            const bitDepth = 16;
+            
+            const bytesPerSample = bitDepth / 8;
+            const blockAlign = numberOfChannels * bytesPerSample;
+            const byteRate = sampleRate * blockAlign;
+            const dataSize = audioBuffer.length * blockAlign;
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+            
+            // WAV header
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            };
+            
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + dataSize, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, format, true);
+            view.setUint16(22, numberOfChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bitDepth, true);
+            writeString(36, 'data');
+            view.setUint32(40, dataSize, true);
+            
+            // Convert audio data
+            let offset = 44;
+            for (let channel = 0; channel < numberOfChannels; channel++) {
+                const channelData = audioBuffer.getChannelData(channel);
+                for (let i = 0; i < channelData.length; i++) {
+                    const sample = Math.max(-1, Math.min(1, channelData[i]));
+                    view.setInt16(offset, sample * 0x7FFF, true);
+                    offset += 2;
+                }
+            }
+            
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+    </script>
+</body>
+</html>
