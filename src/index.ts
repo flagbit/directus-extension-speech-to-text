@@ -22,7 +22,7 @@ export default defineInterface({
 				},
 			},
 			schema: {
-				default_value: 'Text eingeben oder Mikrofon verwenden...',
+				default_value: 'Enter text or use microphone...',
 			},
 		},
 		{

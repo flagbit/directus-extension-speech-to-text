@@ -72,7 +72,7 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: 'Text eingeben oder Mikrofon verwenden...',
+  placeholder: 'Enter text or use microphone...',
   language: 'auto',
   append_mode: true,
   line_separator: 'auto',
@@ -124,7 +124,7 @@ async function startRecording() {
     
     audioChunks.value = [];
     
-    // Use the most compatible format
+    // Use the most compatible audio format
     let mimeType = 'audio/webm;codecs=opus';
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       mimeType = 'audio/webm';
@@ -156,7 +156,7 @@ async function startRecording() {
       isRecording.value = false;
     };
     
-    mediaRecorder.value.start(1000); // Collect data every second
+    mediaRecorder.value.start(1000); // Collect audio data every second
     isRecording.value = true;
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
@@ -255,7 +255,7 @@ async function processAudio() {
             break;
           case 'auto':
           default:
-            // Auto mode: newline for textarea, space for input
+            // Auto mode: use newline for textarea, space for input fields
             if (isTextarea.value) {
               separator = currentValue.endsWith('\n') ? '' : '\n';
             } else {
@@ -289,9 +289,9 @@ async function processAudio() {
 }
 
 function audioBufferToWav(audioBuffer: AudioBuffer): Blob {
-  const numberOfChannels = Math.min(audioBuffer.numberOfChannels, 2); // Limit to stereo
+  const numberOfChannels = Math.min(audioBuffer.numberOfChannels, 2); // Limit to stereo for compatibility
   const sampleRate = audioBuffer.sampleRate;
-  const format = 1; // PCM
+  const format = 1; // PCM format
   const bitDepth = 16;
   
   const bytesPerSample = bitDepth / 8;
@@ -353,7 +353,7 @@ function audioBufferToWav(audioBuffer: AudioBuffer): Blob {
   flex: 1;
 }
 
-/* Force textarea to maintain consistent size */
+/* Force textarea to maintain consistent size and prevent auto-expansion */
 .speech-input :deep(.v-textarea) {
   min-height: auto !important;
 }
@@ -374,7 +374,7 @@ function audioBufferToWav(audioBuffer: AudioBuffer): Blob {
   padding-top: 12px;
 }
 
-/* Smaller button size */
+/* Compact microphone button styling */
 .mic-button {
   min-width: 24px !important;
   max-width: 24px !important;

@@ -1,7 +1,7 @@
 {
   "name": "directus-extension-speech-to-text",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Speech-to-text interface for Directus using OpenAI Whisper API",
   "keywords": [
     "directus",
