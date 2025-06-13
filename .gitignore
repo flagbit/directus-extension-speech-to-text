@@ -5,3 +5,14 @@ dist/
 .env
 .env.local
 .env.*.local
+
+# Development files
+.claude/
+cookies.txt
+simple-demo.html
+install-instructions.md
+speech-to-text.vue
+
+# Docker volumes
+directus_uploads/
+directus_database/

@@ -3,6 +3,12 @@
   "type": "module",
   "version": "1.0.0",
   "description": "Speech-to-text interface for Directus using OpenAI Whisper API",
+  "author": "Jörg Weller <joerg.weller@flagbit.de>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flagbit/directus-extension-speech-to-text.git"
+  },
   "keywords": [
     "directus",
     "directus-extension",

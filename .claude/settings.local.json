@@ -17,7 +17,12 @@
       "Bash(docker exec:*)",
       "Bash(ls:*)",
       "Bash(cp:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(docker system prune:*)",
+      "Bash(grep:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git config:*)"
     ],
     "deny": []
   }

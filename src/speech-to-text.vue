@@ -15,20 +15,21 @@
       />
       
       <div class="mic-button-container">
-        <v-button
-          :color="isRecording ? 'danger' : 'primary'"
-          :loading="isProcessing"
+        <button
           @click="toggleRecording"
-          small
-          :disabled="!apiKey"
-          :tooltip="getButtonTooltip()"
+          :disabled="!apiKey || isProcessing"
+          :title="getButtonTooltip()"
           class="mic-button"
+          :class="{ 
+            'recording': isRecording, 
+            'processing': isProcessing,
+            'disabled': !apiKey || isProcessing
+          }"
         >
-          <template #default>
-            <span v-if="isRecording">⏹</span>
-            <span v-else>🎤</span>
-          </template>
-        </v-button>
+          <span v-if="isProcessing">⏳</span>
+          <span v-else-if="isRecording">⏹</span>
+          <span v-else>🎤</span>
+        </button>
       </div>
     </div>
     
@@ -374,20 +375,56 @@ function audioBufferToWav(audioBuffer: AudioBuffer): Blob {
   padding-top: 12px;
 }
 
-/* Smaller button size */
+/* Custom button styling */
 .mic-button {
-  min-width: 24px !important;
-  max-width: 24px !important;
-  width: 24px !important;
-  height: 24px !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: var(--theme--primary);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.mic-button :deep(.v-btn__content) {
-  font-size: 12px !important;
-  line-height: 1 !important;
-  padding: 0 !important;
+.mic-button:hover:not(.disabled) {
+  background: var(--theme--primary-125);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mic-button.recording {
+  background: var(--theme--danger);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.mic-button.recording:hover {
+  background: var(--theme--danger-125);
+}
+
+.mic-button.processing {
+  background: var(--theme--warning);
+  cursor: wait;
+}
+
+.mic-button.disabled {
+  background: var(--theme--foreground-subdued);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mic-button:active:not(.disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .warning-message,
