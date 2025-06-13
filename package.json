@@ -13,14 +13,24 @@
     "voice",
     "audio"
   ],
+  "author": {
+    "name": "Jörg Weller",
+    "email": "joerg.weller@flagbit.de"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flagbit/directus-extension-speech-to-text.git"
+  },
+  "homepage": "https://github.com/flagbit/directus-extension-speech-to-text",
   "icon": "mic",
   "files": [
     "dist"
   ],
   "directus:extension": {
     "type": "interface",
-    "path": "index.js",
-    "source": "index.js",
+    "path": "dist/index.js",
+    "source": "src/index.ts",
     "host": "^10.10.0"
   },
   "scripts": {

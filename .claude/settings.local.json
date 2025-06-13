@@ -17,7 +17,9 @@
       "Bash(docker exec:*)",
       "Bash(ls:*)",
       "Bash(cp:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "WebFetch(domain:directus.io)"
     ],
     "deny": []
   }
