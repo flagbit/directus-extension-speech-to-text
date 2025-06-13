@@ -1,7 +1,7 @@
 {
   "name": "directus-extension-speech-to-text",
   "type": "module",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Speech-to-text interface for Directus using OpenAI Whisper API",
   "keywords": [
     "directus",
@@ -25,7 +25,9 @@
   "homepage": "https://github.com/flagbit/directus-extension-speech-to-text",
   "icon": "mic",
   "files": [
-    "dist"
+    "dist",
+    "screenshot.png",
+    "screenshot2.png"
   ],
   "directus:extension": {
     "type": "interface",

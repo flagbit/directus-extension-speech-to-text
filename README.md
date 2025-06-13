@@ -12,6 +12,16 @@ A Directus interface extension that enables voice input for text fields using Op
 - 📝 Support for both single-line input and multi-line textarea fields
 - ⚙️ Configurable append mode and text separators
 
+## Screenshots
+
+### Configuration Options
+![Extension Configuration](./screenshot.png)
+*Configure the Speech-to-Text interface with OpenAI API key, language selection, and text separator options.*
+
+### Interface in Action
+![Speech-to-Text Interface](./screenshot2.png)
+*The interface shows both single-line input and textarea fields with integrated microphone buttons for voice input.*
+
 ## Installation
 
 ### From npm (Recommended)
