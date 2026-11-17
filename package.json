@@ -44,5 +44,8 @@
     "@directus/extensions-sdk": "12.0.0",
     "typescript": "^5.5.4",
     "vue": "^3.4.37"
+  },
+  "overrides": {
+    "vite": "4.5.14"
   }
 }
