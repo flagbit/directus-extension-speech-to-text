@@ -43,6 +43,15 @@
   "devDependencies": {
     "@directus/extensions-sdk": "12.0.0",
     "typescript": "^5.5.4",
-    "vue": "^3.4.37"
+    "vue": "^3.5.42"
+  },
+  "overrides": {
+    "vue": "$vue",
+    "axios": "^1.16.0",
+    "form-data": "^4.0.4",
+    "brace-expansion": "^2.1.6",
+    "browserslist": "^4.28.7",
+    "source-map-js": "^1.2.2",
+    "svgo": "^2.8.3"
   }
 }
